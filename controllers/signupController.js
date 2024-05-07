@@ -81,32 +81,78 @@ const verifyToken = asyncHandler(async (req, res) => {
 });
 
 
+// const login = asyncHandler(async (req, res) => {
+//   // handle the req.body username and password
+//   const { username, email, password } = req.body;
+//   console.log(req.body);
+//   // check if the user document exists
+//   const user = await User.findOne({ username, email });
+//   console.log(user);
+//   // check/verify that the password provided is correct, by comparing it with the hashed one
+//   const isPasswordValid = await bcrypt.compare(password, user.password);
+//   if (user && isPasswordValid) {
+//     // create jwt signature
+//     const accessToken = jwt.sign(
+//       {
+//         userId: user._id,
+//         role: user.role,
+//       },
+//       JWT_SECRET
+//     );
+//     // send a response with jwt and message "login successful"
+//     res.status(200).json({ message: "login successful.", accessToken });
+//   } else {
+//     // res.status(401).json({message: "login failed"})
+//     res.status(401);
+//     throw new Error("login failed");
+//   }
+// });
+
 const login = asyncHandler(async (req, res) => {
   // handle the req.body username and password
   const { username, email, password } = req.body;
   console.log(req.body);
+  
   // check if the user document exists
   const user = await User.findOne({ username, email });
   console.log(user);
+  
+  if (!user) {
+    res.status(401).json({ message: "User not found" });
+    return;
+  }
+
   // check/verify that the password provided is correct, by comparing it with the hashed one
   const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (user && isPasswordValid) {
+  
+  if (isPasswordValid) {
     // create jwt signature
     const accessToken = jwt.sign(
       {
         userId: user._id,
         role: user.role,
       },
-      JWT_SECRET
+      JWT_SECRET,
+      { expiresIn: '1d' }  // Optional: Set token expiry as needed
     );
+    
+    // Set token as a cookie
+    res.cookie('token', accessToken, {
+      httpOnly: true,   // The cookie cannot be accessed by client-side JS
+      secure: process.env.NODE_ENV === 'production', // On production, set cookies over HTTPS
+      maxAge: 24 * 60 * 60 * 1000 // cookie will be removed after 24 hours
+    });
+
     // send a response with jwt and message "login successful"
-    res.status(200).json({ message: "login successful.", accessToken });
+    res.status(200).json({ message: "Login successful.", accessToken });
   } else {
-    // res.status(401).json({message: "login failed"})
+    // If login fails
     res.status(401);
-    throw new Error("login failed");
+    throw new Error("Login failed due to invalid credentials");
   }
 });
+
+
 
 const getProtected = asyncHandler(async (req, res) => {
   const { userId } = req.user;
