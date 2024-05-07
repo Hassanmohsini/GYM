@@ -39,7 +39,7 @@ const signup = asyncHandler(async (req, res) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
       from: "onboarding@resend.dev",
-      to: ["abdulhassan.mohsini@dci-student.org"],
+      to: ["danialikhani@gmail.com"],
       subject: "Please verify your account",
       html: `<h1>Hello ${username}</h1>
       <p>Click on the following link to verify your account: 
@@ -64,6 +64,7 @@ const verifyToken = asyncHandler(async (req, res) => {
     if (!verificationToken) {
       return res.status(400).json({ message: "Invalid verification token" });
     }
+    console.log(verificationToken)
 
     // Mark the user as verified
     await User.findByIdAndUpdate(verificationToken.userId, { $set: { verified: true } });
