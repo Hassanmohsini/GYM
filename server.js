@@ -4,6 +4,7 @@ import connectDB from "./config/connectDB.js";
 import userRoutes from "./routes/user.route.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 const { PORT } = process.env;
 
 await connectDB();
@@ -11,6 +12,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser())
 
 app.use("/", userRoutes);
 
