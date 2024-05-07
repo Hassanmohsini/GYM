@@ -3,6 +3,7 @@ import { signup, login, verifyToken, getProtected } from "../controllers/signupC
 import {
   getAdmin,
   postRuleByAdmin,
+  uploadPicture,
   getAllUsersByAdmin,
   getAllRulesByAdmin,
   getAllExercisesByAdmin,
@@ -42,6 +43,7 @@ router.get("/protected", isAuth, getProtected);
 // Admin Section*********************************************************************
 router.get("/admin", isAuth, isAdmin, getAdmin);
 router.post("/rule/admin", isAuth, isAdmin, postRuleByAdmin);
+router.post("/upload/picture", isAuth, isAdmin, uploadPicture);
 router.get("/users/admin", isAuth, isAdmin, getAllUsersByAdmin);
 router.get("/rules/admin", isAuth, isAdmin, getAllRulesByAdmin);
 router.get("/exercises/admin", isAuth, isAdmin, getAllExercisesByAdmin);

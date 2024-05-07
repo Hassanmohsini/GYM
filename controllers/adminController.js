@@ -3,6 +3,30 @@ import Rules from "../models/admin.model.js";
 import Exercise from "../models/trainer.model.js";
 import asyncHandler from "../config/asyncHandler.js";
 import bcrypt from "bcrypt";
+import express from "express";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename);
+
+const storage = multer.diskStorage({
+	destination: function(req, file, cb) {
+		cb(null, "uploads/")
+	},
+	filename: function(req, file, cb) {
+		const splitFileName = file.originalname.split(".");
+		const extension = splitFileName[splitFileName.length - 1];
+		const filename = `${crypto.randomUUID()}.${extension}`;
+		cb(null, filename);
+	},
+});
+
+const app = express();
+const upload = multer({ dest: "uploads/" });
+
 
 const getAdmin = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Hey admin" });
@@ -39,6 +63,13 @@ const postRuleByAdmin = asyncHandler(async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
+});
+
+const uploadPicture = upload.single("picture"); asyncHandler (async (req, res) => {
+  const {username, password} = req.body;
+	const picture = req.file.filename;
+	await User.create({username, password, picture})
+	res.status(201).json({message: "user registered successfully"});
 });
 
 const getAllUsersByAdmin = asyncHandler(async (req, res) => {
@@ -231,6 +262,7 @@ const deleteSingleDataByIdViaAdmin = asyncHandler(async (req, res) => {
 export {
   getAdmin,
   postRuleByAdmin,
+  uploadPicture,
   getAllUsersByAdmin,
   getAllRulesByAdmin,
   getAllExercisesByAdmin,
