@@ -1,25 +1,24 @@
 import { Schema, model } from "mongoose";
 
-// username, email and password
-
-const userSchema = new Schema({
-  username: {type: String, required: true},
-  email: {type: String, required: true},
-  password: {type: String, required: true},
-  profilePicture: {type: String, default: " "},
-  verified: {type: Boolean, default: false},
-  role: {
-    type: String,
-    enum: ["member", "admin", "trainer"],
-    default: "admin",
+const userSchema = new Schema(
+  {
+    username: { type: String, required: true },
+    email: { type: String, required: true },
+    password: { type: String, required: true },
+    profilePicture: { type: Buffer }, // Store image data as Buffer
+    verified: { type: Boolean, default: false },
+    role: {
+      type: String,
+      enum: ["member", "admin", "trainer"],
+      default: "admin",
+    },
   },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-const User = model("user", userSchema);
+const User = model("User", userSchema);
 
 export default User;
-
-
 
 // const userSchema = new Schema({
 //   username: { type: String, required: true },
