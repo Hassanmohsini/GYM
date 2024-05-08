@@ -64,4 +64,5 @@ router.get("/exercises/user", isAuth, getAllExercisesByUser);
 router.get("/profile/user/:id", isAuth, getUserProfileById);
 router.put("/profile/user/:id", isAuth, updateUserProfileById);
 
+
 export default router;
