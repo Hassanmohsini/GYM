@@ -15,7 +15,9 @@ const signup = asyncHandler(async (req, res) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists with this email" });
+      return res
+        .status(400)
+        .json({ message: "User already exists with this email" });
     }
 
     // Hash the password
@@ -44,11 +46,15 @@ const signup = asyncHandler(async (req, res) => {
       html: `<h1>Hello ${username}</h1>
       <p>Click on the following link to verify your account: 
       <a href="http://localhost:${PORT}/verify/${token}">http://localhost:${PORT}/verify/${token}</a>
-      </p>`
+      </p>`,
     });
 
     // Send the response
-    res.status(200).json({ message: "Signup successful. Please check your email for verification." });
+    res
+      .status(200)
+      .json({
+        message: "Signup successful. Please check your email for verification.",
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -67,7 +73,9 @@ const verifyToken = asyncHandler(async (req, res) => {
     console.log(verificationToken)
 
     // Mark the user as verified
-    await User.findByIdAndUpdate(verificationToken.userId, { $set: { verified: true } });
+    await User.findByIdAndUpdate(verificationToken.userId, {
+      $set: { verified: true },
+    });
 
     // Delete the verification token from the database
     await VerificationToken.findByIdAndDelete(verificationToken._id);
@@ -79,7 +87,6 @@ const verifyToken = asyncHandler(async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 // const login = asyncHandler(async (req, res) => {
 //   // handle the req.body username and password
@@ -112,11 +119,11 @@ const login = asyncHandler(async (req, res) => {
   // handle the req.body username and password
   const { username, email, password } = req.body;
   console.log(req.body);
-  
+
   // check if the user document exists
   const user = await User.findOne({ username, email });
   console.log(user);
-  
+
   if (!user) {
     res.status(401).json({ message: "User not found" });
     return;
@@ -124,7 +131,7 @@ const login = asyncHandler(async (req, res) => {
 
   // check/verify that the password provided is correct, by comparing it with the hashed one
   const isPasswordValid = await bcrypt.compare(password, user.password);
-  
+
   if (isPasswordValid) {
     // create jwt signature
     const accessToken = jwt.sign(
@@ -133,14 +140,14 @@ const login = asyncHandler(async (req, res) => {
         role: user.role,
       },
       JWT_SECRET,
-      { expiresIn: '1d' }  // Optional: Set token expiry as needed
+      { expiresIn: "1d" } // Optional: Set token expiry as needed
     );
-    
+
     // Set token as a cookie
-    res.cookie('token', accessToken, {
-      httpOnly: true,   // The cookie cannot be accessed by client-side JS
-      secure: process.env.NODE_ENV === 'production', // On production, set cookies over HTTPS
-      maxAge: 24 * 60 * 60 * 1000 // cookie will be removed after 24 hours
+    res.cookie("token", accessToken, {
+      httpOnly: true, // The cookie cannot be accessed by client-side JS
+      secure: process.env.NODE_ENV === "production", // On production, set cookies over HTTPS
+      maxAge: 24 * 60 * 60 * 1000, // cookie will be removed after 24 hours
     });
 
     // send a response with jwt and message "login successful"
@@ -151,8 +158,6 @@ const login = asyncHandler(async (req, res) => {
     throw new Error("Login failed due to invalid credentials");
   }
 });
-
-
 
 const getProtected = asyncHandler(async (req, res) => {
   const { userId } = req.user;

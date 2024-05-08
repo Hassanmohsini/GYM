@@ -6,13 +6,18 @@ const userSchema = new Schema({
   username: {type: String, required: true},
   email: {type: String, required: true},
   password: {type: String, required: true},
-  verified:{type: Boolean, default:false},
+  profilePicture: {type: String, default: " "},
+  verified: {type: Boolean, default: false},
   role: {
     type: String,
     enum: ["member", "admin", "trainer"],
-    default: "member",
+    default: "admin",
   },
 }, { timestamps: true });
+
+const User = model("user", userSchema);
+
+export default User;
 
 
 
@@ -32,8 +37,3 @@ const userSchema = new Schema({
 //     }
 //   }
 // }, { timestamps: true });
-
-
-const User = model("user", userSchema);
-
-export default User;

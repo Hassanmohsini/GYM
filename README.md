@@ -114,3 +114,22 @@
 - inside the endpoint you find the user by the token
 - you change the isVerified field to true
 # GYM
+
+
+
+
+
+try {
+    // Create a new instance of the Image model
+const user = await User.findById(req.body.id)
+console.log(user);
+
+const picture = req.file.filename;
+console.log(picture);
+  
+  } catch (error) {
+    res.status(500).json({
+      success: 0,
+      message: "Error uploading profile picture.",
+    });
+  }
