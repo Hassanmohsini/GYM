@@ -1,4 +1,8 @@
 import { Router } from "express";
+import express from "express";
+import multer from "multer";
+import path from "path";
+// import User from "../models/user.model.js";
 import { signup, login, verifyToken, getProtected } from "../controllers/signupController.js";
 import {
   getAdmin,
@@ -25,6 +29,7 @@ import {
   getAllRulesByUser,
   getAllExercisesByUser,
   getUserProfileById,
+  uploadProfilePictureByUser,
   updateUserProfileById,
 } from "../controllers/userController.js";
 
@@ -33,6 +38,28 @@ import { isAdmin } from "../middleware/isAdmin.js";
 import { isTrainer } from "../middleware/isTrainer.js";
 
 const router = Router();
+const app = express();
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+		cb(null, "upload/images/")
+	},
+  filename: function(req, file, cb) {
+		const splitFileName = file.originalname.split(".");
+		const extension = splitFileName[splitFileName.length - 1];
+		const filename = `${crypto.randomUUID()}.${extension}`;
+		cb(null, filename);
+	},
+});
+
+app.use("/profile", express.static("upload/images"));
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1000000,
+  },
+});
 
 // General Section
 router.post("/signup", signup);
@@ -62,6 +89,7 @@ router.put("/profile/trainer/:id", isAuth, isTrainer, updateProfileByIdViaTraine
 router.get("/rules/user", isAuth, getAllRulesByUser);
 router.get("/exercises/user", isAuth, getAllExercisesByUser);
 router.get("/profile/user/:id", isAuth, getUserProfileById);
+router.put("/upload", isAuth, upload.single("profile"),uploadProfilePictureByUser);
 router.put("/profile/user/:id", isAuth, updateUserProfileById);
 
 export default router;

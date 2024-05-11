@@ -70,6 +70,26 @@ const getUserProfileById = asyncHandler(async (req, res) => {
   }
 });
 
+const uploadProfilePictureByUser = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.body.id; // Extract the user ID from the request parameters
+    const user = await User.findById(userId); // Find the user by ID
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    const picture = req.file.filename;
+    user.profilePicture = picture;
+    await user.save();
+    res.status(201).json({ message: "Profile picture uploaded" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 const updateUserProfileById = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params; // Extract the ID from the request parameters
@@ -122,5 +142,6 @@ export {
   getAllRulesByUser,
   getAllExercisesByUser,
   getUserProfileById,
+  uploadProfilePictureByUser,
   updateUserProfileById,
 };
